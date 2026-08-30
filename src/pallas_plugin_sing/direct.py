@@ -5,6 +5,7 @@ from pallas.api.limits import is_command_cooldown_ready, refresh_command_cooldow
 from pallas.api.runtime import (
     DirectCommandContext,
     DirectCommandResult,
+    DirectReply,
     DirectWorkJob,
     completion_effect,
     matcher_fallback,
@@ -14,6 +15,7 @@ from ulid import ULID
 
 from .commands import parse_sing_request, parse_song_request
 from .config import get_sing_config
+from .submission import ACCEPTED_REPLY
 
 
 def command_prefixes(suffixes: tuple[str, ...]) -> tuple[str, ...]:
@@ -71,6 +73,7 @@ async def sing(context: DirectCommandContext) -> DirectCommandResult:
         await refresh_command_cooldown(context.event, "sing.sing")
 
     return DirectCommandResult(
+        replies=(DirectReply(ACCEPTED_REPLY),),
         work_jobs=(job,),
         effects=(completion_effect("sing.sing.cooldown", refresh_cooldown),),
     )
@@ -104,6 +107,7 @@ async def request_song(context: DirectCommandContext) -> DirectCommandResult:
         await refresh_command_cooldown(context.event, "sing.request_song")
 
     return DirectCommandResult(
+        replies=(DirectReply(ACCEPTED_REPLY),),
         work_jobs=(job,),
         effects=(completion_effect("sing.request_song.cooldown", refresh_cooldown),),
     )

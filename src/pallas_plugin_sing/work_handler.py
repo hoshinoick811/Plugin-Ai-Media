@@ -2,10 +2,24 @@ from __future__ import annotations
 
 from pallas.api.runtime import DirectBotAction, DirectWorkResult
 
-from .submission import RequestSongSubmission, SingSubmission, submit_request_song, submit_sing
+from .submission import ACCEPTED_REPLY, RequestSongSubmission, SingSubmission, submit_request_song, submit_sing
 
 
-async def handle_sing_submit(payload: dict) -> DirectWorkResult:
+def _failure_action(payload: dict, message: str) -> DirectWorkResult | None:
+    if message == ACCEPTED_REPLY:
+        return None
+    return DirectWorkResult(
+        actions=(
+            DirectBotAction(
+                action="send_group_msg",
+                target_bot_id=int(payload["bot_id"]),
+                payload={"group_id": int(payload["group_id"]), "message_text": message},
+            ),
+        )
+    )
+
+
+async def handle_sing_submit(payload: dict) -> DirectWorkResult | None:
     message = await submit_sing(
         SingSubmission(
             bot_id=int(payload["bot_id"]),
@@ -19,15 +33,7 @@ async def handle_sing_submit(payload: dict) -> DirectWorkResult:
             message_id=int(payload.get("message_id") or 0),
         )
     )
-    return DirectWorkResult(
-        actions=(
-            DirectBotAction(
-                action="send_group_msg",
-                target_bot_id=int(payload["bot_id"]),
-                payload={"group_id": int(payload["group_id"]), "message_text": message},
-            ),
-        )
-    )
+    return _failure_action(payload, message)
 
 
 async def handle_request_song(payload: dict) -> DirectWorkResult | None:
@@ -43,15 +49,7 @@ async def handle_request_song(payload: dict) -> DirectWorkResult | None:
     )
     if message is None:
         return None
-    return DirectWorkResult(
-        actions=(
-            DirectBotAction(
-                action="send_group_msg",
-                target_bot_id=int(payload["bot_id"]),
-                payload={"group_id": int(payload["group_id"]), "message_text": message},
-            ),
-        )
-    )
+    return _failure_action(payload, message)
 
 
 def work_handlers():
