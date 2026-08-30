@@ -1,6 +1,6 @@
 [project]
 name = "pallas-plugin-ai-media"
-version = "4.3.15"
+version = "4.3.16"
 description = "Pallas-Bot 官方扩展：牛牛唱歌与牛牛说（TTS）。"
 readme = "README.md"
 license = { file = "LICENSE" }
