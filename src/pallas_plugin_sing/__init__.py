@@ -23,7 +23,7 @@ from pallas.product.llm.knowledge.declare import knowledge_source_row
 
 from .commands import matches_song_title, parse_play_request, parse_sing_request, parse_song_request
 from .config import build_sing_command_prefixes, get_sing_config, sing_server_url, sync_sing_ingress_command_prefixes
-from .ncm_login import get_song_id, get_song_title
+from .ncm_login import get_song_id, get_song_title_with_artist
 from .submission import (
     PlaySubmission,
     RequestSongSubmission,
@@ -479,11 +479,12 @@ async def _(event: GroupMessageEvent):
     )
     if not await guard_command_cooldown(song_title_cmd, event, "sing.song_title", speak=False):
         return
-    song_title = await get_song_title(progress.song_id)
-    if not song_title:
+    song_detail = await get_song_title_with_artist(progress.song_id)
+    if not song_detail:
         return
-
-    await safe_finish(song_title_cmd, f"{song_title}")
+    song_title, artists = song_detail
+    reply = f"{song_title} - {' / '.join(artists)}" if artists else song_title
+    await safe_finish(song_title_cmd, reply)
 
 
 # 按当前音频映射展开 ingress 前缀（否则自定义前缀进不了唱歌 matcher）

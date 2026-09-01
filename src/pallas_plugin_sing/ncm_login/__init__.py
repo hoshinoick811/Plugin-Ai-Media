@@ -200,3 +200,21 @@ async def get_song_id(song_name: str):
 async def get_song_title(song_id):
     response = await ncm.track.GetTrackDetail(song_id)
     return response["songs"][0]["name"]
+
+
+async def get_song_title_with_artist(song_id):
+    """查询歌曲名与歌手列表，返回 (歌名, [歌手...])；无有效结果时返回 None。"""
+    response = await ncm.track.GetTrackDetail(song_id)
+    songs = response.get("songs")
+    if not songs:
+        return None
+    song = songs[0]
+    name = str(song.get("name") or "").strip()
+    if not name:
+        return None
+    artists = [
+        str(artist.get("name") or "").strip()
+        for artist in (song.get("ar") or [])
+        if str(artist.get("name") or "").strip()
+    ]
+    return name, artists

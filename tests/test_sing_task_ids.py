@@ -163,6 +163,7 @@ def _bootstrap_stub_modules() -> None:
     ncm_login = types.ModuleType("pallas_plugin_sing.ncm_login")
     ncm_login.get_song_id = None
     ncm_login.get_song_title = None
+    ncm_login.get_song_title_with_artist = None
     _install_stub("pallas_plugin_sing.ncm_login", ncm_login)
 
 
